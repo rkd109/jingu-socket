@@ -2,7 +2,6 @@
     "name": "chat.io"
   , "description": "example chat application with socket.io"
   , "version": "0.0.1"
-  , "main": "index.js"
   , "dependencies": {
         "express": "2.5.5"
       , "jade": "0.16.4"
