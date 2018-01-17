@@ -11,11 +11,15 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      .dimmed { position: absolute; padding: 30px; font-size: 50px; font-weight: bold; text-align: center; background-color: palevioletred; height: 100%; width: 100%; opacity: 0.5; }
     </style>
 
   </head>
   <body>
-    <div style="height: 450px">
+    <div class="dimmed">
+      <input type="text" id="enterNick" placeholder="Enter nickname"  >
+    </div>
+    <div id="messagesArea" style="height: 450px; display:none;">
       <ul id="messages" style="height: 435px; overflow: auto;"  ></ul>
       <form action="">
         <input id="myMessage" autocomplete="off" /><button>Send</button>
@@ -26,7 +30,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
-      var name = 'jingu';
+      var name = 'nonamed';
       // var color = 'red';
       var message;
 
@@ -38,10 +42,19 @@
         messages.scrollTop = messages.scrollHeight;
         return false;
       });
+
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').html(msg));
       });
 
+      $('#enterNick').keyup(function(e){
+          if(e.keyCode == 13)
+          {
+              name = $('#enterNick').val();
+              $(".dimmed").remove();
+              $('#messagesArea').show();
+          }
+      });
     </script>
   </body>
 </html>
