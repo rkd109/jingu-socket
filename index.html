@@ -53,6 +53,9 @@
               name = $('#enterNick').val();
               $(".dimmed").remove();
               $('#messagesArea').show();
+              message ="<div  style='text-align : center'>"+'<span>' +'<strong>'+ name +'</strong>' +' joined </span></div>';
+              socket.emit('chat message', message);
+              messages.scrollTop = messages.scrollHeight;
           }
       });
     </script>
