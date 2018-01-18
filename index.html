@@ -18,6 +18,7 @@
   <body>
     <div class="dimmed">
       <input type="text" id="enterNick" placeholder="Enter nickname"  >
+      <input type="text" id="enterRoomName" placeholder="Enter RoomName" style="display : none;"  >
     </div>
     <div id="messagesArea" style="height: 450px; display:none;">
       <ul id="messages" style="height: 435px; overflow: auto;"  ></ul>
@@ -33,30 +34,69 @@
       var name = 'nonamed';
       // var color = 'red';
       var message;
-
+      var rommname = 'default';
+      //send message
       $('form').submit(function(){
         message ='<strong>' + name + '</strong>' + ' : ' + '<span>' + $('#myMessage').val() + '</span>';
 
-        socket.emit('chat message', message);
+        // socket.emit('chat message', message);
+        socket.emit('chat message', {  roomId: rommname, message: message });
+
         $('#myMessage').val('');
         messages.scrollTop = messages.scrollHeight;
         return false;
       });
 
-      socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').html(msg));
-      });
 
+
+      //input nickname
       $('#enterNick').keyup(function(e){
           if(e.keyCode == 13)
           {
+            if($('#enterNick').val() != '' || $('#enterNick').val())
+            {
               name = $('#enterNick').val();
+
+              // $(".dimmed").remove();
+              $('#enterRoomName').show();
+              $('#enterNick').hide();
+              // message ="<div  style='text-align : center'>"+'<span>' +'<strong>'+ name +'</strong>' +' joined </span></div>';
+              // socket.emit('chat message', message);
+              messages.scrollTop = messages.scrollHeight;
+            }
+          }
+      });
+
+      $('#enterRoomName').keyup(function(e){
+          if(e.keyCode == 13)
+          {
+            if($('#enterRoomName').val() != '' || $('#enterRoomName').val())
+            {
+              rommname = $('#enterRoomName').val();
+
               $(".dimmed").remove();
               $('#messagesArea').show();
-              message ="<div  style='text-align : center'>"+'<span>' +'<strong>'+ name +'</strong>' +' joined </span></div>';
-              socket.emit('chat message', message);
+
+              socket.emit('join', {roomId: rommname});
+
+              // message ="<div  style='text-align : center'>"+'<span>' +'<strong>'+ name +'</strong>' +' joined </span></div>';
+              // socket.emit('chat message', message);
               messages.scrollTop = messages.scrollHeight;
+            }
           }
+      });
+
+      
+
+      socket.on('disconnect', function(msg) {
+        $('#messages').append($('<li>').html(msg));
+      });
+      socket.on('disconnect', function(msg) {
+        $('#messages').append($('<li>').html(msg));
+      });
+      //Receive message
+      socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').html(msg));
       });
     </script>
   </body>
