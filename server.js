@@ -31,7 +31,7 @@ io.on('connection', function(socket){
   // });
     // Join Room 
     socket.on('join', function(data) {
-        socket.join('room' + data.roomId);
+        socket.join('room' + data.roomname);
         username = data.nickName;
         roomname = data.roomname;
         io.sockets.in('room' + data.roomname).emit('join message', data.nickName);
