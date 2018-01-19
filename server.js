@@ -34,7 +34,7 @@ io.on('connection', function(socket){
     io.emit('connect', data);
     console.log('connect users' + data);
   });
-    // Join Room
+    // Join Room 
     socket.on('join', function(data) {
       socket.join('room' + data.roomId);
       username = data.nickName;
