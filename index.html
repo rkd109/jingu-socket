@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/css/style.css">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -11,20 +13,37 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
-      .dimmed { position: absolute; padding: 30px; font-size: 50px; font-weight: bold; text-align: center; background: url('http://loremflickr.com/g/320/240/korea'); height: 100%; width: 100%; opacity: 0.5; }
+      .dimmed { position: absolute; padding: 30px; font-size: 50px; font-weight: bold; text-align: center; background: #333; height: 100%; width: 100%;}
     </style>
 
   </head>
   <body>
+      <div class="centered" style="z-index: 2;">
+          <div class="group" >
+              <input type="text" id="roomName" class="custominput"/>
+              <label for="name">Room Name</label>
+              <div class="bar"></div>
+          </div>
+          <div class="group">
+              <input type="text" id="nickName" class="custominput"/>
+              <label for="name">Nick Name</label>
+              <div class="bar"></div>
+          </div>
+          <input type="button" id="enterChat" style="z-index: 10;" value="Enter" class="custominput"/>  
+        </div>
+        
     <div class="dimmed">
-      <input type="text" id="enterNick" placeholder="Enter nickname"  >
-      <input type="text" id="enterRoomName" placeholder="Enter RoomName" style="display : none;"  >
     </div>
-    <div id="messagesArea" style="height: 450px; display:none;">
-      <ul id="messages" style="height: 435px; overflow: auto;"  ></ul>
-      <form action="">
-        <input id="myMessage" autocomplete="off" /><button>Send</button>
-      </form>
+    <div id="messagesArea" style=" height: 450px; display:none;">
+        <div style="text-align: center">
+            <label style="color: #2196f3; position: relative; margin-bottom: 50px; " id="roomlabel"> Room Name : </label>
+        </div>
+        <div >
+            <ul id="messages" style= "margin-top: 50px; height: 435px; overflow: auto;"  ></ul>
+            <form action="">
+                <input id="myMessage" autocomplete="off" /><button>Send</button>
+            </form>
+        </div>
     </div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
@@ -32,72 +51,74 @@
     <script>
       var socket = io();
       var name = 'nonamed';
-      // var color = 'red';
       var message;
       var rommname = 'default';
+
       //send message
       $('form').submit(function(){
-        message ='<strong>' + name + '</strong>' + ' : ' + '<span>' + $('#myMessage').val() + '</span>';
 
-        // socket.emit('chat message', message);
-        socket.emit('chat message', {  roomId: rommname, message: message });
+          message ='<strong>' + name + '</strong>' + ' : ' + '<span>' + $('#myMessage').val() + '</span>';
 
-        $('#myMessage').val('');
-        messages.scrollTop = messages.scrollHeight;
-        return false;
+          socket.emit('chat message', {  roomId: rommname, message: message });
+
+          $('#myMessage').val('');
+
+          messages.scrollTop = messages.scrollHeight;
+          return false;
       });
 
+      $('#enterChat').click(function(){
 
-
-      //input nickname
-      $('#enterNick').keyup(function(e){
-          if(e.keyCode == 13)
-          {
-            if($('#enterNick').val() != '' || $('#enterNick').val())
-            {
-              name = $('#enterNick').val();
-
-              // $(".dimmed").remove();
-              $('#enterRoomName').show();
-              $('#enterNick').hide();
-              // message ="<div  style='text-align : center'>"+'<span>' +'<strong>'+ name +'</strong>' +' joined </span></div>';
-              // socket.emit('chat message', message);
-              messages.scrollTop = messages.scrollHeight; 
-            }
-          }
+        if(!chack())
+        {
+          alert('name error');
+          return false;
+        }
+          
+          name = $('#nickName').val();
+          rommname = $('#roomName').val();
+          $('#roomlabel').html($('#roomlabel').html() +" "+ rommname);
+          $('#roomlabel').html
+          $(".dimmed").remove();
+          $(".centered").remove();
+          $('#messagesArea').show();
+          socket.emit('join', {roomId: rommname , nickName : name});
+          
+          messages.scrollTop = messages.scrollHeight; 
       });
 
-      $('#enterRoomName').keyup(function(e){
-          if(e.keyCode == 13)
-          {
-            if($('#enterRoomName').val() != '' || $('#enterRoomName').val())
-            {
-              rommname = $('#enterRoomName').val();
+      //Receive connect
+      socket.on('join message', function(msg) {
+        
+        message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
 
-              $(".dimmed").remove();
-              $('#messagesArea').show();
-
-              socket.emit('join', {roomId: rommname});
-
-              // message ="<div  style='text-align : center'>"+'<span>' +'<strong>'+ name +'</strong>' +' joined </span></div>';
-              // socket.emit('chat message', message);
-              messages.scrollTop = messages.scrollHeight;
-            }
-          }
+        $('#messages').append($('<li>').html(message));
       });
-
-      
 
       socket.on('disconnect', function(msg) {
-        $('#messages').append($('<li>').html(msg));
+        message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
+        $('#messages').append($('<li>').html(message));
       });
-      socket.on('disconnect', function(msg) {
-        $('#messages').append($('<li>').html(msg));
-      });
+
       //Receive message
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').html(msg));
       });
+      function chack(){
+        var checknick = $('#nickName').val();
+        var checkroom = $('#roomName').val();
+        var pattern = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]/gi;
+        
+        if(checknick.length <= 0 || pattern.test(checknick)){
+          return false;
+        }
+
+        if(checkroom.length <= 0 || pattern.test(checkroom)){
+          return false;
+        }
+
+        return true;
+      }
     </script>
   </body>
 </html>

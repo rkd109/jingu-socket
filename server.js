@@ -1,11 +1,17 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = process.env.PORT || 8080;
 
+var port = process.env.PORT || 8080;
+// var publicPath = path.resolve(__dirname, 'www');
+// var path = require('path');
 app.get('/', function(req, res){
   res.sendfile('index.html');
 });
+
+app.use(express.static(__dirname + '/public'));
+console.log(__dirname);
 
 http.listen(port, function(){
   console.log('listening on *:'+port);
@@ -16,8 +22,9 @@ io.on('connection', function(socket){
   //   io.emit('chat message', msg);
   // });
   // io.emit('chat message', 'a user connected');
+  var  name ;
   socket.on('disconnect', function(data){
-    io.emit('disconnect', data);
+    io.emit('disconnect', name);
     console.log('exit users' + data);
   });
   socket.on('connect', function(data){
@@ -27,7 +34,9 @@ io.on('connection', function(socket){
     // Join Room
     socket.on('join', function(data) {
       socket.join('room' + data.roomId);
-      console.log('join users' + data);
+      name = data.nickName;
+      io.sockets.in('room' + data.roomId).emit('join message', data.nickName);
+      console.log('join users' + data.nickName);
     });
     // Broadcast to room
     socket.on('chat message', function(data) {
