@@ -43,4 +43,4 @@ io.on('connection', function(socket){
       io.sockets.in('room' + data.roomId).emit('chat message', data.message);
       console.log('chat message' + data);
     });
-});
+});  
