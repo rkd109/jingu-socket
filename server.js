@@ -28,23 +28,23 @@ io.on('connection', function(socket){
     // io.emit('disconnect', name);
     io.sockets.in('room' + roomname).emit('disconnect', username);
     
-    console.log('exit users' + data);
+    console.log('exit users' + username);
   });
-  socket.on('connect', function(data){
-    io.emit('connect', data);
-    console.log('connect users' + data);
-  });
+  // socket.on('connect', function(data){
+  //   io.emit('connect', data);
+  //   console.log('connect users' + data);
+  // });
     // Join Room 
     socket.on('join', function(data) {
       socket.join('room' + data.roomId);
       username = data.nickName;
       roomname = data.roomname;
       io.sockets.in('room' + data.roomname).emit('join message', data.nickName);
-      console.log('join users' + data.nickName);
+      console.log('join users : ' + data.nickName);
     });
     // Broadcast to room
     socket.on('chat message', function(data) {
       io.sockets.in('room' + data.roomname).emit('chat message', data.message);
-      console.log('chat message' + data);
+      console.log('chat message : ' + data.message);
     });
 });  
