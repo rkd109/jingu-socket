@@ -78,7 +78,7 @@
           name = $('#nickName').val();
           rommname = $('#roomName').val();
           $('#roomlabel').html($('#roomlabel').html() +" "+ rommname);
-          $('#roomlabel').html
+          //$('#roomlabel').html
           $(".dimmed").remove();
           $(".centered").remove();
           $('#messagesArea').show();
@@ -104,6 +104,7 @@
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').html(msg));
       });
+
       function chack(){
         var checknick = $('#nickName').val();
         var checkroom = $('#roomName').val();
