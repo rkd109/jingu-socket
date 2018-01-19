@@ -22,9 +22,12 @@ io.on('connection', function(socket){
   //   io.emit('chat message', msg);
   // });
   // io.emit('chat message', 'a user connected');
-  var  name ;
+  var username ;
+  var roomname;
   socket.on('disconnect', function(data){
-    io.emit('disconnect', name);
+    // io.emit('disconnect', name);
+    io.sockets.in('room' + roomname).emit('disconnect', username);
+    
     console.log('exit users' + data);
   });
   socket.on('connect', function(data){
@@ -34,13 +37,14 @@ io.on('connection', function(socket){
     // Join Room
     socket.on('join', function(data) {
       socket.join('room' + data.roomId);
-      name = data.nickName;
-      io.sockets.in('room' + data.roomId).emit('join message', data.nickName);
+      username = data.nickName;
+      roomname = data.roomname;
+      io.sockets.in('room' + data.roomname).emit('join message', data.nickName);
       console.log('join users' + data.nickName);
     });
     // Broadcast to room
     socket.on('chat message', function(data) {
-      io.sockets.in('room' + data.roomId).emit('chat message', data.message);
+      io.sockets.in('room' + data.roomname).emit('chat message', data.message);
       console.log('chat message' + data);
     });
 });  

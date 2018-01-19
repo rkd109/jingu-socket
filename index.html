@@ -59,7 +59,7 @@
 
           message ='<strong>' + name + '</strong>' + ' : ' + '<span>' + $('#myMessage').val() + '</span>';
 
-          socket.emit('chat message', {  roomId: rommname, message: message });
+          socket.emit('chat message', {  roomname: rommname, message: message });
 
           $('#myMessage').val('');
 
@@ -82,7 +82,7 @@
           $(".dimmed").remove();
           $(".centered").remove();
           $('#messagesArea').show();
-          socket.emit('join', {roomId: rommname , nickName : name});
+          socket.emit('join', {roomname: rommname , nickName : name});
           
           messages.scrollTop = messages.scrollHeight; 
       });
