@@ -3,26 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Minimal Material Design Form Input </title>
-  <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
-
-  
-  
-      <link rel="stylesheet" href="css/style.css">
-
-  
+      <!-- <link rel="stylesheet" href="css/style.css"> -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font: 13px Helvetica, Arial; }
+          /* form { background: #000; padding: 3px; position: fixed; width: 100%; }
+          form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+          form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; } */
+          /* #messages { list-style-type: none; margin: 0; padding: 0; }
+          #messages li { padding: 5px 10px; }
+          #messages li:nth-child(odd) { background: #eee; } */
+          .dimmed { position: absolute; padding: 30px; font-size: 50px; font-weight: bold; text-align: center; background: #333; height: 100%; width: 100%;}
+        </style>
 </head>
 
 <body>
-  
-<div class="centered">
-  <div class="group">
-    <input type="text" id="name" required="required"/>
-    <label for="name">Name</label>
-    <div class="bar"></div>
-  </div>
-</div>
-  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <div id="messagesArea">
+        <div >
+            <label id="roomlabel"> Room Name :  aa</label>
+        </div>
+        <div style="float: left; width:75%;">
+            <ul id="messages" ><li><div> <span> <strong>aaaa</strong>  joined</span><div></div></div></li><li><strong>aaaa</strong> : <span>aa</span></li></ul>
+            <form action="">
+                <input id="myMessage" autocomplete="off"><button>Send</button>
+            </form>
+        </div>
+        <div style="float:right; width: 20%">
+          <label> user list </label>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Cras justo odio</li>
+            <li class="list-group-item">Dapibus ac facilisis in</li>
+            <li class="list-group-item">Morbi leo risus</li>
+            <li class="list-group-item">Porta ac consectetur ac</li>
+            <li class="list-group-item">Vestibulum at eros</li>
+          </ul>
+        </div>
+    </div>
 
-  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
 </body>
 </html>

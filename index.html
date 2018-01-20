@@ -2,7 +2,9 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <!-- <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     <link rel="stylesheet" href="/css/style.css">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -15,7 +17,9 @@
       #messages li:nth-child(odd) { background: #eee; }
       .dimmed { position: absolute; padding: 30px; font-size: 50px; font-weight: bold; text-align: center; background: #333; height: 100%; width: 100%;}
     </style>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
       <div class="centered" style="z-index: 2;">
@@ -36,17 +40,27 @@
     </div>
     <div id="messagesArea" style=" height: 450px; display:none;">
         <div style="text-align: center">
-            <label style="color: #2196f3; position: relative; margin-bottom: 50px; " id="roomlabel"> Room Name : </label>
+            <label style="color: #2196f3; position: relative; " id="roomlabel"> Room Name : </label>
         </div>
-        <div >
+        <div style="float: left; width:75%;">
             <ul id="messages" style= "margin-top: 50px; height: 435px; overflow: auto;"  ></ul>
             <form action="">
                 <input id="myMessage" autocomplete="off" /><button>Send</button>
             </form>
         </div>
+        <div style="float: right; width:20%;">
+          
+          <ul class="list-group list-group-flush" id="userlist"> 
+              
+          </ul>
+        </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
@@ -83,21 +97,39 @@
           $(".centered").remove();
           $('#messagesArea').show();
           socket.emit('join', {roomname: rommname , nickName : name});
-          
+          // $('#userlist').html($('#userlist').html() + '<li class="list-group-item">'+ name +'</li>');
           messages.scrollTop = messages.scrollHeight; 
       });
 
       //Receive connect
-      socket.on('join message', function(msg) {
+      socket.on('join message', function(msg , userlist) {
         
-        message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
+          message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
 
-        $('#messages').append($('<li>').html(message));
+          $('#messages').append($('<li>').html(message));
+
+          var userlisthtml = '<span style="color: #2196f3"> user list </span>';
+        
+        $.each(userlist, function( index, value ) {
+          if(value != null)
+              userlisthtml = userlisthtml +'<li class="list-group-item">'+ value +'</li>';
+        });
+          $('#userlist').html(userlisthtml);
+          console.log('userlist : ' + userlist);
       });
 
-      socket.on('disconnect', function(msg) {
+      socket.on('disconnect', function(msg , userlist) {
         message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
         $('#messages').append($('<li>').html(message));
+            var userlisthtml = '<span style="color: #2196f3"> user list </span>';
+        
+        $.each(userlist, function( index, value ) {
+          if(value != null)
+              userlisthtml = userlisthtml +'<li class="list-group-item">'+ value +'</li>';
+        });
+          $('#userlist').html(userlisthtml);
+
+        console.log(userlist);
       });
 
       //Receive message  
