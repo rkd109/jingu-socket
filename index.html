@@ -41,7 +41,8 @@
         .column {
             float: left;
             padding: 10px;
-            
+            overflow: auto;
+            height: 500px;
         }
 
         /* Left and right column */
@@ -52,9 +53,7 @@
         /* Middle column */
         .column.middle {
             width: 80%;
-            overflow: auto;
             
-            height: 500px;
         }
 
         /* Clear floats after the columns */
@@ -304,14 +303,28 @@
         //Receive message  
         socket.on('chat message', function(msg , nick)
         {
-            
-            if(nick == name){
-                nick += '(Me)' ;
+            var receiveMessage
+            // if(nick == name)
+            // {
+            //     receiveMessage ='<strong>' + nick + ' (Me)</strong>' + ' : ' + '<span>' + msg + '</span>';
+            //     $('#messages').append($('<li>').html(receiveMessage));
+            //     $('.column.middle').scrollTop($('.column.middle').prop("scrollHeight"));    
+            // }
+            // else
+            // {
+            //     receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
+            //     $('#messages').append($('<li>').html(receiveMessage));
+            // }
+            if(nick == name)
+            {
+                nick += ' (Me)';
             }
-            var receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
+            receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
             
             $('#messages').append($('<li>').html(receiveMessage));
-            $('.column.middle').scrollTop($('.column.middle').prop("scrollHeight"));
+
+            $('.column.middle').scrollTop($('.column.middle').prop("scrollHeight"));    
+            
         });
 
         socket.on('connection', function(msg)
