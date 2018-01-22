@@ -78,27 +78,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+
     <script>
-        var socket = io();
-        var name = 'nonamed';
-        var message;
-        var roomname = 'default';
-        var roomListArea = null;
-        var receiveRoomList = []; 
+        var socket = io(), name = 'nonamed' ,message , roomname = 'default', roomListArea = null , receiveRoomList = [];
+
         //send message
-        $('form').submit(function(){
+        $('form').submit(function()
+        {
 
             socket.emit('chat message', {  roomname: roomname, message: $('#myMessage').val() , nickName : name });
 
             $('#myMessage').val('');
 
             messages.scrollTop = messages.scrollHeight;
+            
             return false;
         });
-
 
         $("input[name*='enterInfo']").keyup(function(e)
         {
@@ -111,12 +108,18 @@
             enterRoom();
         });
 
+        $('#roomName').click(function()
+        {
+            socket.emit('connection',receiveRoomList);
+        });
+
         function closePopup()
         {
             $('#layer1').hide();
         }        
 
-        function enterRoom(){
+        function enterRoom()
+        {
 
             var valueValidation = check();
 
@@ -140,8 +143,6 @@
             $('#layer1').hide();
         }
 
-
- 
         function check()
         {
             var checknick = $('#nickName').val();
@@ -164,14 +165,8 @@
             return "success";
         }   
 
-        $('#roomName').click(function()
+        function layer_popup()
         {
-            socket.emit('connection',receiveRoomList);
-            
-   
-        });
-
-        function layer_popup(){
             var el = $('#layer1');
             
             var $elWidth = ~~(el.outerWidth()),
@@ -197,13 +192,16 @@
                 el.hide();
             });
         }
-        function selectRoom(selectRoomName){
+
+        function selectRoom(selectRoomName)
+        {
             $('#roomName').val(selectRoomName.value);
             $('#layer1').hide();
         }
 
        //Receive connect
-        socket.on('join message', function(msg , userlist) {
+        socket.on('join message', function(msg , userlist) 
+        {
 
             message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
 
@@ -219,7 +217,8 @@
             $('#userlist').html(userlisthtml);
         });
 
-        socket.on('disconnect', function(msg , userlist) {
+        socket.on('disconnect', function(msg , userlist) 
+        {
             message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
             $('#messages').append($('<li>').html(message));
                 var userlisthtml = '<span style="color: #2196f3"> user list </span>';
@@ -233,7 +232,8 @@
         });
 
         //Receive message  
-        socket.on('chat message', function(msg , nick){
+        socket.on('chat message', function(msg , nick)
+        {
             
             if(nick == name){
                 nick += '(Me)' ;
@@ -243,13 +243,13 @@
             $('#messages').append($('<li>').html(receiveMessage));
         });
 
-        socket.on('connection', function(msg){
-
-  
+        socket.on('connection', function(msg)
+        {
 
             if(JSON.stringify(receiveRoomList) != JSON.stringify(msg) && msg.length >  0)
             {
                 receiveRoomList = msg;
+
                 $.each(msg, function( index, value ) {
                     var roomhtml = '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value='+ value.roomname +' >' + 
                     value.roomname + '<span class="badge badge-primary badge-pill" >'+ value.userlist.length +'</span> </button>' ;
