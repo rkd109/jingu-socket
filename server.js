@@ -8,8 +8,13 @@ var port = process.env.PORT || 8080;
 io.set('heartbeat timeout', 50000);
 io.set('heartbeat interval', 10000);
 
+//var roomlist = [ {roomname : 'a', userlist : new Array('a','b','c') }, {roomname : 'b', userlist : new Array('d','e') } ];
+
 app.get('/', function(req, res){
+  
   res.sendfile('index.html');
+  console.log('sendfile');
+
 });
 
 app.use(express.static(__dirname + '/public'));
@@ -17,16 +22,26 @@ app.use(express.static(__dirname + '/public'));
 http.listen(port, function(){
   console.log('listening on *:'+port);
 });
-// var userlist = [];
-var roomlist = [];
+// var roomlist = [];
+var roomlist = [ {roomname : 'a', userlist : new Array('a','b','c') }, {roomname : 'b', userlist : new Array('d','e') } ];
 io.on('connection', function(socket){
     var username ;
     var roomname;
+    console.log('connection');
+
+    socket.on('connection', function(data){
+       console.log('coon')
+        socket.emit('connection', roomlist);
+
+     });
+
     socket.on('disconnect', function(data){
       //1. 유저가 해당 방에서 나간다 .. 유저가 나간 방을 검색
         var disconnectinfo =  roomlist.filter(x => x.roomname === roomname)
 
         
+
+
         if(disconnectinfo.length == 0) 
           return false;
 
@@ -41,6 +56,7 @@ io.on('connection', function(socket){
         
         console.log('exit users' + username);
   });
+
     // Join Room 
     socket.on('join', function(data) {
         socket.join('room' + data.roomname);
@@ -71,6 +87,7 @@ io.on('connection', function(socket){
 
         console.log('join users : ' + data.nickName);
     });
+
     // Broadcast to room
     socket.on('chat message', function(data) {
         io.sockets.in('room' + data.roomname).emit('chat message', data.message);

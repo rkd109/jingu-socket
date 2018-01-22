@@ -16,12 +16,33 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
       .dimmed { position: absolute; padding: 30px; font-size: 50px; font-weight: bold; text-align: center; background: #333; height: 100%; width: 100%;}
+      .pop-layer .pop-container { padding: 20px 25px;}
+      .pop-layer .btn-r { width: 100%; margin: 10px 0 20px; padding-top: 10px; border-top: 1px solid #DDD; text-align: right; }
+      .pop-layer { display: none; position: absolute; top: 50%; left: 50%; width: 410px; height: auto; background-color: #fff; border: 5px solid #3571B5; z-index: 10;}
+       a.btn-layerClose { display: inline-block; height: 25px; padding: 0 14px 0; border: 1px solid #304a8a; background-color: #3f5a9d; font-size: 13px; color: #fff; line-height: 25px;}
+       a.btn-layerClose:hover { border: 1px solid #091940; background-color: #1f326a; color: #fff;}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
+      <div id="layer1" class="pop-layer">
+          <div class="pop-container">
+              <div class="pop-conts">
+
+                  <div class="list-group" id="roomlist">
+                      생성된 방 목록
+                  </div>
+
+                  <div class="btn-r">
+                      <a href="#" class="btn-layerClose">Close</a>
+                  </div>
+                  <!--// content-->
+              </div>
+          </div>
+      </div>
+
       <div class="centered" style="z-index: 2;">
           <div class="group" >
               <input type="text" id="roomName" class="custominput"/>
@@ -67,6 +88,11 @@
       var name = 'nonamed';
       var message;
       var rommname = 'default';
+
+      // <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value="ROOMNAME" >
+                        
+      //                   <span class="badge badge-primary badge-pill" >14</span>
+      //               </button>
 
       //send message
       $('form').submit(function(){
@@ -137,6 +163,21 @@
         $('#messages').append($('<li>').html(msg));
       });
 
+      socket.on('connection', function(msg){
+        console.log(msg)
+        var roomlist;
+        // msg.array.forEach(element => {
+        //     roomlist = '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value='+ element.roomname +' >';
+        //     roomlist = roomlist + '<span class="badge badge-primary badge-pill" >'+ roomlist.userlist.length +'</span> </button>' ;
+        // });
+        $.each(msg, function( index, value ) {
+            roomlist = roomlist + '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value='+ value.roomname +' > ' ;
+            roomlist = roomlist + value.roomname + '<span class="badge badge-primary badge-pill" >'+ value.userlist.length +'</span> </button>' ;
+        });
+        $('#roomlist').html($('#roomlist').html() + roomlist)
+        console.log( $('#roomlist').html());
+       });
+
       function chack(){
         var checknick = $('#nickName').val();
         var checkroom = $('#roomName').val();
@@ -152,6 +193,41 @@
  
         return true;
       }
+
+      $('#roomName').click(function(){
+        socket.emit('connection','');
+        layer_popup();
+    });
+    function layer_popup(){
+        var el = $('#layer1');
+
+        var $elWidth = ~~(el.outerWidth()),
+            $elHeight = ~~(el.outerHeight()),
+            docWidth = $(document).width(),
+            docHeight = $(document).height();
+
+        // 화면의 중앙에 레이어를 띄운다.
+        if ($elHeight < docHeight || $elWidth < docWidth) {
+            el.css({
+                marginTop: -$elHeight /2,
+                marginLeft: -$elWidth/2,
+                display : 'block'
+            })
+        } else {
+            el.css({top: 0, left: 0});
+        }
+
+        el.find('a.btn-layerClose').click(function(){
+           el.hide();
+        });
+    }
+    function selectRoom(selectRoomName){
+      
+
+
+      $('#roomName').val(selectRoomName.value);
+      $('#layer1').hide();
+    }
     </script>
   </body>
 </html>
