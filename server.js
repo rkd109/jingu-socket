@@ -3,7 +3,8 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 8000;
+//var port = 8000; -> aws port
 
 io.set('heartbeat timeout', 50000);
 io.set('heartbeat interval', 10000);
@@ -38,11 +39,8 @@ io.on('connection', function(socket){
         var disconnectinfo =  roomlist.find(x => x.roomname === roomname);
         // console.log('disconnectinfo  ' + disconnectinfo);
         // console.log('disconnectinfo.userlist  ' + disconnectinfo.userlist);
-        if(disconnectinfo == undefined) {
-            // console.log('성공?');
-          return false;
-
-        }
+        if(disconnectinfo == undefined)
+            return false;
 
         // console.log(disconnectinfo);
 

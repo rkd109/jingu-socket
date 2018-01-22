@@ -45,12 +45,12 @@
 
       <div class="centered" style="z-index: 2;">
           <div class="group" >
-              <input type="text" id="roomName" name="enterInfo" class="custominput" onfocusout='closePopup()'/>
+              <input type="text" id="roomName" name="enterInfo" class="custominput" />
               <label for="name">Room Name</label>
               <div class="bar"></div>
           </div>
           <div class="group">
-              <input type="text" id="nickName" name="enterInfo" class="custominput"/>
+              <input type="text" id="nickName" name="enterInfo" class="custominput" onfocus="closePopup()"/>
               <label for="name">Nick Name</label>
               <div class="bar"></div>
           </div>
@@ -103,6 +103,11 @@
                 enterRoom();
         });
 
+        $('#roomName').keyup(function(e)
+        {
+            closePopup()
+        });
+        
         $('#enterChat').click(function()
         {
             enterRoom();
