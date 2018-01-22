@@ -32,7 +32,7 @@
               <div class="pop-conts">
 
                   <div class="list-group" id="roomlist">
-                      생성된 방 목록
+                      <span style="margin-bottom: 15px;"> Create Room List </span>
                   </div>
 
                   <div class="btn-r">
@@ -45,12 +45,12 @@
 
       <div class="centered" style="z-index: 2;">
           <div class="group" >
-              <input type="text" id="roomName" class="custominput"/>
+              <input type="text" id="roomName" name="enterInfo" class="custominput"/>
               <label for="name">Room Name</label>
               <div class="bar"></div>
           </div>
           <div class="group">
-              <input type="text" id="nickName" class="custominput"/>
+              <input type="text" id="nickName" name="enterInfo" class="custominput"/>
               <label for="name">Nick Name</label>
               <div class="bar"></div>
           </div>
@@ -64,15 +64,13 @@
             <label style="color: #2196f3; position: relative; " id="roomlabel"> Room Name : </label>
         </div>
         <div style="float: left; width:75%;">
-            <ul id="messages" style= "margin-top: 50px; height: 435px; overflow: auto;"  ></ul>
-            <form action="">
+            <ul id="messages" style= "margin-top: 50px; overflow: auto;"  ></ul>
+            <form action="" style="bottom: 0;">
                 <input id="myMessage" autocomplete="off" /><button>Send</button>
             </form>
         </div>
-        <div style="float: right; width:20%;">
-          
+        <div style="float: right; width:20%; margin-top: 35px;">
           <ul class="list-group list-group-flush" id="userlist"> 
-              
           </ul>
         </div>
     </div>
@@ -80,154 +78,179 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    
+
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io();
-      var name = 'nonamed';
-      var message;
-      var rommname = 'default';
+        var socket = io();
+        var name = 'nonamed';
+        var message;
+        var rommname = 'default';
+        var roomListArea = null;
+        var receiveRoomList = []; 
+        //send message
+        $('form').submit(function(){
 
-      // <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value="ROOMNAME" >
-                        
-      //                   <span class="badge badge-primary badge-pill" >14</span>
-      //               </button>
+            socket.emit('chat message', {  roomname: rommname, message: $('#myMessage').val() , nickName : name });
 
-      //send message
-      $('form').submit(function(){
+            $('#myMessage').val('');
 
-          message ='<strong>' + name + '</strong>' + ' : ' + '<span>' + $('#myMessage').val() + '</span>';
+            messages.scrollTop = messages.scrollHeight;
+            return false;
+        });
 
-          socket.emit('chat message', {  roomname: rommname, message: message });
 
-          $('#myMessage').val('');
-
-          messages.scrollTop = messages.scrollHeight;
-          return false;
-      });
-
-      $('#enterChat').click(function(){
-
-        if(!chack())
+        $("input[name*='enterInfo']").keyup(function(e)
         {
-          alert('name error');
-          return false;
-        }
-          
-          name = $('#nickName').val();
-          rommname = $('#roomName').val();
-          $('#roomlabel').html($('#roomlabel').html() +" "+ rommname);
-          //$('#roomlabel').html
-          $(".dimmed").remove();
-          $(".centered").remove();
-          $('#messagesArea').show();
-          socket.emit('join', {roomname: rommname , nickName : name});
-          // $('#userlist').html($('#userlist').html() + '<li class="list-group-item">'+ name +'</li>');
-          messages.scrollTop = messages.scrollHeight; 
-      });
-
-      //Receive connect
-      socket.on('join message', function(msg , userlist) {
-        
-          message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
-
-          $('#messages').append($('<li>').html(message));
-
-          var userlisthtml = '<span style="color: #2196f3"> user list </span>';
-        
-        $.each(userlist, function( index, value ) {
-          if(value != null)
-              userlisthtml = userlisthtml +'<li class="list-group-item">'+ value +'</li>';
+            if(e.keyCode == 13)
+                enterRoom();
         });
-          $('#userlist').html(userlisthtml);
-          console.log('userlist : ' + userlist);
-      });
 
-      socket.on('disconnect', function(msg , userlist) {
-        message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
-        $('#messages').append($('<li>').html(message));
-            var userlisthtml = '<span style="color: #2196f3"> user list </span>';
-        
-        $.each(userlist, function( index, value ) {
-          if(value != null)
-              userlisthtml = userlisthtml +'<li class="list-group-item">'+ value +'</li>';
+        $('#enterChat').click(function(){
+            enterRoom();
         });
-          $('#userlist').html(userlisthtml);
 
-        console.log(userlist);
-      });
+        function enterRoom(){
 
-      //Receive message  
-      socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').html(msg));
-      });
+            var valueValidation = check();
 
-      socket.on('connection', function(msg){
-        console.log(msg)
-        var roomlist;
-        // msg.array.forEach(element => {
-        //     roomlist = '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value='+ element.roomname +' >';
-        //     roomlist = roomlist + '<span class="badge badge-primary badge-pill" >'+ roomlist.userlist.length +'</span> </button>' ;
-        // });
-        $.each(msg, function( index, value ) {
-            roomlist = roomlist + '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value='+ value.roomname +' > ' ;
-            roomlist = roomlist + value.roomname + '<span class="badge badge-primary badge-pill" >'+ value.userlist.length +'</span> </button>' ;
-        });
-        $('#roomlist').html($('#roomlist').html() + roomlist)
-        console.log( $('#roomlist').html());
-       });
+            if(valueValidation != 'success')
+            {
+                alert(valueValidation);
 
-      function chack(){
-        var checknick = $('#nickName').val();
-        var checkroom = $('#roomName').val();
-        var pattern = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]/gi;
-        
-        if(checknick.length <= 0 || pattern.test(checknick)){
-          return false;
+                return false;
+            }
+            
+            name = $('#nickName').val();
+            rommname = $('#roomName').val();
+            $('#roomlabel').html($('#roomlabel').html() +" "+ rommname);
+            //$('#roomlabel').html
+            $(".dimmed").remove();
+            $(".centered").remove();
+            $('#messagesArea').show();
+            socket.emit('join', {roomname: rommname , nickName : name});
+            // $('#userlist').html($('#userlist').html() + '<li class="list-group-item">'+ name +'</li>');
+            messages.scrollTop = messages.scrollHeight; 
         }
 
-        if(checkroom.length <= 0 || pattern.test(checkroom)){
-          return false;
-        }
  
-        return true;
-      }
+        function check(){
+            var checknick = $('#nickName').val();
+            var checkroom = $('#roomName').val();
+            var pattern = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]/gi;
+            
+            if(checkroom.length <= 0 || pattern.test(checkroom)){
+                return "Room Name Error";
+            }
 
-      $('#roomName').click(function(){
-        socket.emit('connection','');
-        layer_popup();
-    });
-    function layer_popup(){
-        var el = $('#layer1');
+            if(checknick.length <= 0 || pattern.test(checknick)){
+                return "Nick Name Error";
+            }
+            
+            return "success";
+        }   
 
-        var $elWidth = ~~(el.outerWidth()),
-            $elHeight = ~~(el.outerHeight()),
-            docWidth = $(document).width(),
-            docHeight = $(document).height();
+        $('#roomName').click(function(){
+            socket.emit('connection',receiveRoomList);
+        });
 
-        // 화면의 중앙에 레이어를 띄운다.
-        if ($elHeight < docHeight || $elWidth < docWidth) {
-            el.css({
-                marginTop: -$elHeight /2,
-                marginLeft: -$elWidth/2,
-                display : 'block'
-            })
-        } else {
-            el.css({top: 0, left: 0});
+        function layer_popup(){
+            var el = $('#layer1');
+
+            var $elWidth = ~~(el.outerWidth()),
+                $elHeight = ~~(el.outerHeight()),
+                docWidth = $(document).width(),
+                docHeight = $(document).height();
+
+            // 화면의 중앙에 레이어를 띄운다.
+            if ($elHeight < docHeight || $elWidth < docWidth) 
+            {
+                el.css({
+                    marginTop: -$elHeight /2,
+                    marginLeft: -$elWidth/2,
+                    display : 'block'
+                })
+            } 
+            // else 
+            // {
+            //     el.css({top: 0, left: 0});
+            // }
+
+            el.find('a.btn-layerClose').click(function(){
+            el.hide();
+            });
+        }
+        function selectRoom(selectRoomName){
+            $('#roomName').val(selectRoomName.value);
+            $('#layer1').hide();
         }
 
-        el.find('a.btn-layerClose').click(function(){
-           el.hide();
+       //Receive connect
+        socket.on('join message', function(msg , userlist) {
+
+            message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
+
+            $('#messages').append($('<li>').html(message));
+
+            var userlisthtml = '<span style="color: #2196f3"> user list </span>';
+
+            $.each(userlist, function( index, value ) {
+                if(value != null)
+                    userlisthtml = userlisthtml +'<li class="list-group-item">'+ value +'</li>';
+            });
+
+            $('#userlist').html(userlisthtml);
+
+            console.log('userlist : ' + userlist);
         });
-    }
-    function selectRoom(selectRoomName){
-      
+
+        socket.on('disconnect', function(msg , userlist) {
+            message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
+            $('#messages').append($('<li>').html(message));
+                var userlisthtml = '<span style="color: #2196f3"> user list </span>';
+
+            $.each(userlist, function( index, value ) {
+                if(value != null)
+                    userlisthtml = userlisthtml +'<li class="list-group-item">'+ value +'</li>';
+            });
+                $('#userlist').html(userlisthtml);
+
+            console.log(userlist);
+        });
+
+        //Receive message  
+        socket.on('chat message', function(msg , nick){
+            console.log(nick);
+            if(nick == name){
+                nick += '(Me)' ;
+            }
+            var receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
+            console.log(receiveMessage);
+            $('#messages').append($('<li>').html(receiveMessage));
+        });
+
+        socket.on('connection', function(msg){
+
+            if(JSON.stringify(receiveRoomList) != JSON.stringify(msg) && msg.length >  0)
+            {
+                receiveRoomList = msg;
+                $.each(msg, function( index, value ) {
+                    var roomhtml = '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" onclick="selectRoom(this)" value='+ value.roomname +' >' + 
+                    value.roomname + '<span class="badge badge-primary badge-pill" >'+ value.userlist.length +'</span> </button>' ;
+                    $('#roomlist').html($('#roomlist').html() + roomhtml);
+                });
+            }
+
+            if(msg.length == 0 ){
+                $('#layer1').hide();
+            }
+                        
+            if($('#layer1').css('display') == 'none' && receiveRoomList.length > 0 ){
+                layer_popup();
+            }
+        });
 
 
-      $('#roomName').val(selectRoomName.value);
-      $('#layer1').hide();
-    }
     </script>
   </body>
 </html>
