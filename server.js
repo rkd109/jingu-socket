@@ -27,9 +27,9 @@ io.on('connection', function(socket){
 
     socket.on('connection', function(data){
        console.log('coon')
-       if (JSON.stringify(roomlist) != JSON.stringify(data)){
+    //    if (JSON.stringify(roomlist) != JSON.stringify(data)){
         socket.emit('connection', roomlist);
-       }
+    //    }
 
      });
 
@@ -92,18 +92,14 @@ io.on('connection', function(socket){
         //1. 방의 중복 여부를 확인한다
         //2. 중복이 없다면 리스트에 방과 방의 유저리스트를 추가한다.
         //2. 중복이 있다면 리스트를 검색하여 해당 방의 유저리스트에 추가한다
-        
 
         // io.sockets.in('room' + data.roomname).emit('userlist', userlist);
 
-        console.log('join users : ' + data.nickName);
     });
 
     // Broadcast to room
     socket.on('chat message', function(data) {
-        console.log('chat message : ' + data.message);
-        console.log('chat roomname : ' + data.roomname);
-        console.log('chat nick : ' + data.nickName);
+
         io.sockets.in('room' + data.roomname).emit('chat message', data.message , data.nickName);
         
     });

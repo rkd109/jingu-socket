@@ -45,7 +45,7 @@
 
       <div class="centered" style="z-index: 2;">
           <div class="group" >
-              <input type="text" id="roomName" name="enterInfo" class="custominput"/>
+              <input type="text" id="roomName" name="enterInfo" class="custominput" onfocusout='closePopup()'/>
               <label for="name">Room Name</label>
               <div class="bar"></div>
           </div>
@@ -85,13 +85,13 @@
         var socket = io();
         var name = 'nonamed';
         var message;
-        var rommname = 'default';
+        var roomname = 'default';
         var roomListArea = null;
         var receiveRoomList = []; 
         //send message
         $('form').submit(function(){
 
-            socket.emit('chat message', {  roomname: rommname, message: $('#myMessage').val() , nickName : name });
+            socket.emit('chat message', {  roomname: roomname, message: $('#myMessage').val() , nickName : name });
 
             $('#myMessage').val('');
 
@@ -106,9 +106,15 @@
                 enterRoom();
         });
 
-        $('#enterChat').click(function(){
+        $('#enterChat').click(function()
+        {
             enterRoom();
         });
+
+        function closePopup()
+        {
+            $('#layer1').hide();
+        }        
 
         function enterRoom(){
 
@@ -122,23 +128,31 @@
             }
             
             name = $('#nickName').val();
-            rommname = $('#roomName').val();
-            $('#roomlabel').html($('#roomlabel').html() +" "+ rommname);
+            roomname = $('#roomName').val();
+            $('#roomlabel').html($('#roomlabel').html() +" "+ roomname);
             //$('#roomlabel').html
             $(".dimmed").remove();
             $(".centered").remove();
             $('#messagesArea').show();
-            socket.emit('join', {roomname: rommname , nickName : name});
+            socket.emit('join', {roomname: roomname , nickName : name});
             // $('#userlist').html($('#userlist').html() + '<li class="list-group-item">'+ name +'</li>');
             messages.scrollTop = messages.scrollHeight; 
+            $('#layer1').hide();
         }
 
+
  
-        function check(){
+        function check()
+        {
             var checknick = $('#nickName').val();
             var checkroom = $('#roomName').val();
             var pattern = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]/gi;
+            var temproom = receiveRoomList.find(x=> x.roomname == checkroom);
             
+            if(temproom != undefined && temproom.userlist.find(x => x == checknick)){
+                return "Duplicate Name Error";
+            }
+
             if(checkroom.length <= 0 || pattern.test(checkroom)){
                 return "Room Name Error";
             }
@@ -150,13 +164,16 @@
             return "success";
         }   
 
-        $('#roomName').click(function(){
+        $('#roomName').click(function()
+        {
             socket.emit('connection',receiveRoomList);
+            
+   
         });
 
         function layer_popup(){
             var el = $('#layer1');
-
+            
             var $elWidth = ~~(el.outerWidth()),
                 $elHeight = ~~(el.outerHeight()),
                 docWidth = $(document).width(),
@@ -177,7 +194,7 @@
             // }
 
             el.find('a.btn-layerClose').click(function(){
-            el.hide();
+                el.hide();
             });
         }
         function selectRoom(selectRoomName){
@@ -220,16 +237,18 @@
 
         //Receive message  
         socket.on('chat message', function(msg , nick){
-            console.log(nick);
+            
             if(nick == name){
                 nick += '(Me)' ;
             }
             var receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
-            console.log(receiveMessage);
+            
             $('#messages').append($('<li>').html(receiveMessage));
         });
 
         socket.on('connection', function(msg){
+
+  
 
             if(JSON.stringify(receiveRoomList) != JSON.stringify(msg) && msg.length >  0)
             {
@@ -244,8 +263,9 @@
             if(msg.length == 0 ){
                 $('#layer1').hide();
             }
-                        
-            if($('#layer1').css('display') == 'none' && receiveRoomList.length > 0 ){
+
+            if(receiveRoomList.length > 0 )
+            {
                 layer_popup();
             }
         });
