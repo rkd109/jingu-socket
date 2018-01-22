@@ -26,7 +26,6 @@ io.on('connection', function(socket){
     var roomname;
 
     socket.on('connection', function(data){
-       console.log('coon')
     //    if (JSON.stringify(roomlist) != JSON.stringify(data)){
         socket.emit('connection', roomlist);
     //    }
@@ -37,15 +36,15 @@ io.on('connection', function(socket){
         //1. 유저가 해당 방에서 나간다 .. 유저가 나간 방을 검색
         // var disconnectinfo =  roomlist.filter(x => x.roomname === roomname);
         var disconnectinfo =  roomlist.find(x => x.roomname === roomname);
-        console.log('disconnectinfo  ' + disconnectinfo);
+        // console.log('disconnectinfo  ' + disconnectinfo);
         // console.log('disconnectinfo.userlist  ' + disconnectinfo.userlist);
         if(disconnectinfo == undefined) {
-            console.log('성공?');
+            // console.log('성공?');
           return false;
 
         }
 
-        console.log(disconnectinfo);
+        // console.log(disconnectinfo);
 
         //2. 해당 방의 유저리스트에서 유저 이름 삭제
         // delete disconnectinfo[0].userlist[disconnectinfo[0].userlist.indexOf(username)];
@@ -64,7 +63,7 @@ io.on('connection', function(socket){
         // delete userlist[userlist.indexOf(username)];
         // io.sockets.in('room' + roomname).emit('disconnect', username, userlist);
         
-        console.log('exit users' + username);
+        // console.log('exit users' + username);
 
   });
 
