@@ -7,9 +7,7 @@
 
     <link rel="stylesheet" href="/css/style.css">
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; width: 100%; }
+
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
@@ -20,8 +18,71 @@
       .pop-layer .btn-r { width: 100%; margin: 10px 0 20px; padding-top: 10px; border-top: 1px solid #DDD; text-align: right; }
       .pop-layer { display: none; position: absolute; top: 50%; left: 50%; width: 410px; height: auto; background-color: #fff; border: 5px solid #3571B5; z-index: 10;}
        a.btn-layerClose { display: inline-block; height: 25px; padding: 0 14px 0; border: 1px solid #304a8a; background-color: #3f5a9d; font-size: 13px; color: #fff; line-height: 25px;}
-       a.btn-layerClose:hover { border: 1px solid #091940; background-color: #1f326a; color: #fff;}
+       a.btn-layerClose:hover { border: 1px solid #091940; background-color: #1f326a; color: #fff;} 
+
+       * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+        }
+
+        body {
+        margin: 0;
+        font: 13px Helvetica, Arial;
+        }
+
+        /* Style the header */
+        .header {
+            background-color: #f1f1f1;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Create three unequal columns that floats next to each other */
+        .column {
+            float: left;
+            padding: 10px;
+            
+        }
+
+        /* Left and right column */
+        .column.side {
+            width: 20%;
+        }
+
+        /* Middle column */
+        .column.middle {
+            width: 80%;
+            overflow: auto;
+            
+            height: 500px;
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+        @media (max-width: 600px) {
+            .column.side, .column.middle {
+                width: 100%;
+            }
+        }
+
+        /* Style the footer */
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        
     </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -38,7 +99,6 @@
                   <div class="btn-r">
                       <a href="#" class="btn-layerClose">Close</a>
                   </div>
-                  <!--// content-->
               </div>
           </div>
       </div>
@@ -59,20 +119,25 @@
         
     <div class="dimmed">
     </div>
-    <div id="messagesArea" style=" height: 450px; display:none;">
-        <div style="text-align: center">
-            <label style="color: #2196f3; position: relative; " id="roomlabel"> Room Name : </label>
+    <div id="messagesArea" style="display:none;">
+        <div class="header" >
+            <span style="color: #2196f3; font: 400 36.66667px Roboto; cursor: text;" id="roomlabel"> Room Name : </span>
         </div>
-        <div style="float: left; width:75%;">
-            <ul id="messages" style= "margin-top: 50px; overflow: auto;"  ></ul>
+        <div class="row">
+            <div class="column middle">
+                <ul id="messages" style= "margin-top: 50px; overflow: auto;"  ></ul>
+            </div>
+
+            <div class="column side">
+                <ul class="list-group list-group-flush" id="userlist"> </ul>
+            </div>
+        </div>
+        <div class="footer">
             <form action="" style="bottom: 0;">
-                <input id="myMessage" autocomplete="off" /><button>Send</button>
+                    <input id="myMessage" autocomplete="off" /><button>Send</button>
             </form>
         </div>
-        <div style="float: right; width:20%; margin-top: 35px;">
-          <ul class="list-group list-group-flush" id="userlist"> 
-          </ul>
-        </div>
+
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -92,7 +157,7 @@
 
             $('#myMessage').val('');
 
-            messages.scrollTop = messages.scrollHeight;
+            
             
             return false;
         });
@@ -107,7 +172,7 @@
         {
             closePopup()
         });
-        
+
         $('#enterChat').click(function()
         {
             enterRoom();
@@ -144,7 +209,7 @@
             $('#messagesArea').show();
             socket.emit('join', {roomname: roomname , nickName : name});
             // $('#userlist').html($('#userlist').html() + '<li class="list-group-item">'+ name +'</li>');
-            messages.scrollTop = messages.scrollHeight; 
+            $('.column.middle').scrollTop($('.column.middle').prop("scrollHeight"));
             $('#layer1').hide();
         }
 
@@ -246,6 +311,7 @@
             var receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
             
             $('#messages').append($('<li>').html(receiveMessage));
+            $('.column.middle').scrollTop($('.column.middle').prop("scrollHeight"));
         });
 
         socket.on('connection', function(msg)
