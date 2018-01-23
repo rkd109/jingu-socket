@@ -87,7 +87,7 @@
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-      <div id="layer1" class="pop-layer">
+      <div id="roomListLayer" class="pop-layer">
           <div class="pop-container">
               <div class="pop-conts">
 
@@ -146,7 +146,7 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        var socket = io(), name = 'nonamed' ,message , roomname = 'default', roomListArea = null , receiveRoomList = [];
+        var socket = io(), name = 'nonamed', roomname = 'default', roomListArea = null, receiveRoomList = [];
 
         //send message
         $('form').submit(function()
@@ -155,8 +155,6 @@
             socket.emit('chat message', {  roomname: roomname, message: $('#myMessage').val() , nickName : name });
 
             $('#myMessage').val('');
-
-            
             
             return false;
         });
@@ -184,12 +182,11 @@
 
         function closePopup()
         {
-            $('#layer1').hide();
+            $('#roomListLayer').hide();
         }        
 
         function enterRoom()
         {
-
             var valueValidation = check();
 
             if(valueValidation != 'success')
@@ -209,7 +206,7 @@
             socket.emit('join', {roomname: roomname , nickName : name});
             // $('#userlist').html($('#userlist').html() + '<li class="list-group-item">'+ name +'</li>');
             $('.column.middle').scrollTop($('.column.middle').prop("scrollHeight"));
-            $('#layer1').hide();
+            $('#roomListLayer').hide();
         }
 
         function check()
@@ -236,43 +233,45 @@
 
         function layer_popup()
         {
-            var el = $('#layer1');
+            var roomListLayer = $('#roomListLayer');
             
-            var $elWidth = ~~(el.outerWidth()),
-                $elHeight = ~~(el.outerHeight()),
+            var $elWidth = Math.floor((roomListLayer.outerWidth())),
+                $elHeight = Math.floor((roomListLayer.outerHeight())),
                 docWidth = $(document).width(),
                 docHeight = $(document).height();
-
+                //Math.floor == ~~
+            // console.log('roomListLayer.outerWidth()' + roomListLayer.outerWidth());
+            // console.log('roomListLayer.outerHeight()' + roomListLayer.outerHeight());
+            // console.log('~~(roomListLayer.outerWidth())' + ~~(roomListLayer.outerWidth()));
+            // console.log('~~(roomListLayer.outerHeight())' + ~~(roomListLayer.outerHeight()));
+            // console.log('Math.floor(roomListLayer.outerWidth())' + Math.floor(roomListLayer.outerWidth()));
+            // console.log('Math.floor(roomListLayer.outerWidth())' + Math.floor(roomListLayer.outerHeight()));
             // 화면의 중앙에 레이어를 띄운다.
             if ($elHeight < docHeight || $elWidth < docWidth) 
             {
-                el.css({
+                roomListLayer.css({
                     marginTop: -$elHeight /2,
                     marginLeft: -$elWidth/2,
                     display : 'block'
                 })
             } 
-            // else 
-            // {
-            //     el.css({top: 0, left: 0});
-            // }
 
-            el.find('a.btn-layerClose').click(function(){
-                el.hide();
+            roomListLayer.find('a.btn-layerClose').click(function(){
+                roomListLayer.hide();
             });
         }
 
         function selectRoom(selectRoomName)
         {
             $('#roomName').val(selectRoomName.value);
-            $('#layer1').hide();
+            $('#roomListLayer').hide();
         }
 
        //Receive connect
         socket.on('join message', function(msg , userlist) 
         {
 
-            message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
+            var message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  joined</span><div>';
 
             $('#messages').append($('<li>').html(message));
 
@@ -288,7 +287,7 @@
 
         socket.on('disconnect', function(msg , userlist) 
         {
-            message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
+            var message ="<div style='text-align: center'> <span> <strong>" + msg + '</strong>  disconnect </span><div>';
             $('#messages').append($('<li>').html(message));
                 var userlisthtml = '<span style="color: #2196f3"> user list </span>';
 
@@ -315,10 +314,10 @@
             //     receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
             //     $('#messages').append($('<li>').html(receiveMessage));
             // }
+            
             if(nick == name)
-            {
                 nick += ' (Me)';
-            }
+
             receiveMessage ='<strong>' + nick + '</strong>' + ' : ' + '<span>' + msg + '</span>';
             
             $('#messages').append($('<li>').html(receiveMessage));
@@ -342,7 +341,7 @@
             }
 
             if(msg.length == 0 ){
-                $('#layer1').hide();
+                $('#roomListLayer').hide();
             }
 
             if(receiveRoomList.length > 0 )
